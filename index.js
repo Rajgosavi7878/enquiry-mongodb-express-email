@@ -7,12 +7,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const url = "mongodb+srv://gosaviraj66:8OBwu1j1f4WM7lWB@cluster0.uq2pm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
 app.post("/save",(req,res)=>{
-	const url = "mongodb://0.0.0.0:27017";
 	const client = new MongoClient(url);
 	const db = client.db("kc20_march25");
 	const coll = db.collection("student");
 	const doc = {"name":req.body.name,"phone":req.body.phone,"query":req.body.query};
+	console.log(doc);
 	coll.insertOne(doc)
 	.then(result =>{
 		
