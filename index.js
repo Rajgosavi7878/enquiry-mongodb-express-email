@@ -1,42 +1,51 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
+const {MongoClient} = require("mongodb");
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Check DB Connected Or Not
-const url =
-  "mongodb+srv://gosaviraj66:cy5BaJ2RKEbc0rQm@cluster0.j5pus.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-// Connect to your Atlas cluster
+app.post("/save",(req,res)=>{
+	const url = "mongodb://0.0.0.0:27017";
+	const client = new MongoClient(url);
+	const db = client.db("kc20_march25");
+	const coll = db.collection("student");
+	const doc = {"name":req.body.name,"phone":req.body.phone,"query":req.body.query};
+	coll.insertOne(doc)
+	.then(result =>{
+		
+	//Create a transporter object
+	let transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+		user: 'gosaviraj66@gmail.com',
+		pass: 'momncvobphuivkzw'
+	}
+	});
 
+	let mailOptions = {
+		from:'gosaviraj66@gmail.com',
+		to:'chinmaytaware10@gmail.com',
+		subject:'Enquiry from ' + req.body.name,
+		text: " phone = " + req.body.phone + " query = " + req.body.query
+	};
 
- /*
-async function run() {
-  try {
-    await client.connect();
-    console.log("Successfully connected to Atlas");
-  } catch (err) {
-    console.log(err.stack);
-  } 
-} 
+	//Send email
+	transporter.sendMail(mailOptions,(error,info)=>{
+	if(error){
+		console.log(error);
+		return res.status(500).json(error);
+	}
+	return res.status(200).json("mail send");
+	});
 
-run().catch(console.dir);
-*/
-
-app.post("/save", (req, res) => {
-  const client = new MongoClient(url);
-  const db = client.db("fb_19march25");
-  const coll = db.collection("student");
-  const doc = { name: req.body.name, feedback: req.body.feedback };
-  console.log(doc);
-  coll
-    .insertOne(doc)
-    .then((result) => res.send(result))
-    .catch((error) => res.send(error));
+	})
+	.catch(error => res.send(error));
 });
 
-app.listen(11000, () => {
-  console.log("ready @ 11000");
-});
+app.listen(9000,()=>{console.log("ready @ 9000 ")});
+
+// 8OBwu1j1f4WM7lWB
+
